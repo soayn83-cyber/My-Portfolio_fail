@@ -9,3 +9,8 @@ services:
     startCommand: npm start
     healthCheckPath: /api/status
     autoDeploy: true
+    envVars:
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        value: https://cosieayyjjpcmywowxfx.supabase.co
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvc2llYXl5ampwY215d293eGZ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU2NzYzNzcsImV4cCI6MjA5MTI1MjM3N30.3wR4jbPWrbh0oINk76OmzkRTF1vcWgE23ojm8-Xpub8
