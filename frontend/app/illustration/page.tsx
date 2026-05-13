@@ -1,16 +1,9 @@
-import { createClient } from "@/lib/supabase/server"
 import { PageHeader } from "@/components/page-header"
 import { IllustrationClient } from "@/components/illustration-client"
+import { getPosts } from "@/lib/site-data"
 
 export default async function IllustrationPage() {
-  const supabase = await createClient()
-  
-  const { data: posts } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("category", "illustration")
-    .eq("is_published", true)
-    .order("created_at", { ascending: false })
+  const posts = getPosts("illustration")
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -19,7 +12,7 @@ export default async function IllustrationPage() {
           title="Illustration"
           description="A collection of my illustrations and artwork"
         />
-        <IllustrationClient posts={posts || []} />
+        <IllustrationClient posts={posts} />
       </div>
     </div>
   )

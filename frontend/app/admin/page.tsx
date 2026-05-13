@@ -1,7 +1,7 @@
-import { createClient } from "@/lib/supabase/server"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import { AdminDashboard } from "@/components/admin/admin-dashboard"
+import { getPosts, getProfile, getSiteConfig } from "@/lib/site-data"
 
 export default async function AdminPage() {
   const cookieStore = await cookies()
@@ -11,26 +11,15 @@ export default async function AdminPage() {
     redirect("/admin/login")
   }
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // Make a dummy user object for the dashboard if none is returned
-  const dummyUser = user || { email: "admin", id: "admin-token", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: "" }
-
-  const [
-    { data: posts },
-    { data: settings },
-    { data: profile }
-  ] = await Promise.all([
-    supabase.from("posts").select("*").order("created_at", { ascending: false }),
-    supabase.from("site_settings").select("*").single(),
-    supabase.from("profile").select("*").single()
-  ])
+  const user = { email: "admin@local" }
+  const posts = getPosts()
+  const settings = getSiteConfig()
+  const profile = getProfile()
 
   return (
     <AdminDashboard
-      user={dummyUser as any}
-      posts={posts || []}
+      user={user}
+      posts={posts}
       settings={settings}
       profile={profile}
     />

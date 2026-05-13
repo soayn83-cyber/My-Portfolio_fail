@@ -1,13 +1,6 @@
-import { createClient } from "@/lib/supabase/server"
 import { ProfileContent } from "@/components/profile-content"
+import { getProfile } from "@/lib/site-data"
 
 export default async function ProfilePage() {
-  const supabase = await createClient()
-  
-  const { data: profile } = await supabase
-    .from("profile")
-    .select("*")
-    .single()
-
-  return <ProfileContent profile={profile} />
+  return <ProfileContent profile={getProfile()} />
 }

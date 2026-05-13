@@ -1,21 +1,9 @@
 {
   "node": {
-    "60cb95c6951851505047eb56810a99c5faa4ffe4fe": {
-      "workers": {
-        "app/admin/page": {
-          "moduleId": 82937,
-          "async": false,
-          "exportedName": "revalidateSite",
-          "filename": "frontend/app/actions.ts"
-        }
-      },
-      "exportedName": "revalidateSite",
-      "filename": "frontend/app/actions.ts"
-    },
     "0042fdef312d007ff216ae4381a28d4a5f8363c590": {
       "workers": {
         "app/admin/page": {
-          "moduleId": 82937,
+          "moduleId": 44406,
           "async": false,
           "exportedName": "logoutAdmin",
           "filename": "frontend/app/admin/login/actions.ts"

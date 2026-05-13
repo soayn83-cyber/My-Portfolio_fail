@@ -79,28 +79,10 @@
       "namedRegex": "^/admin/login(?:/)?$"
     },
     {
-      "page": "/api/comments",
-      "regex": "^/api/comments(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/comments(?:/)?$"
-    },
-    {
       "page": "/api/status",
       "regex": "^/api/status(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/api/status(?:/)?$"
-    },
-    {
-      "page": "/api/supabase/reload-cache",
-      "regex": "^/api/supabase/reload\\-cache(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/supabase/reload\\-cache(?:/)?$"
-    },
-    {
-      "page": "/api/upload",
-      "regex": "^/api/upload(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/api/upload(?:/)?$"
     },
     {
       "page": "/illustration",

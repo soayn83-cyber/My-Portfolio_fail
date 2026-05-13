@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server"
 import { PostDetail } from "@/components/post-detail"
 import { notFound } from "next/navigation"
+import { getCommentsForPost, getPostById } from "@/lib/site-data"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -8,29 +8,18 @@ interface PageProps {
 
 export default async function IllustrationDetailPage({ params }: PageProps) {
   const { id } = await params
-  const supabase = await createClient()
-  
-  const { data: post } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .eq("is_published", true)
-    .single()
+  const post = getPostById(id)
 
   if (!post) {
     notFound()
   }
 
-  const { data: comments } = await supabase
-    .from("comments")
-    .select("id, author_name, content, created_at")
-    .eq("post_id", id)
-    .order("created_at", { ascending: true })
+  const comments = getCommentsForPost(id)
 
   return (
     <PostDetail
       post={post}
-      comments={comments || []}
+      comments={comments}
       backHref="/illustration"
       backLabel="Back to Illustration"
     />

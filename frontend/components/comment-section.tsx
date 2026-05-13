@@ -7,13 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { MessageCircle, Trash2 } from "lucide-react"
-
-interface Comment {
-  id: string
-  author_name: string
-  content: string
-  created_at: string
-}
+import type { Comment } from "@/lib/site-data"
 
 interface CommentSectionProps {
   postId: string
@@ -22,7 +16,6 @@ interface CommentSectionProps {
 
 export function CommentSection({ postId, initialComments }: CommentSectionProps) {
   const [comments, setComments] = useState(initialComments)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [deletePassword, setDeletePassword] = useState("")
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -35,34 +28,23 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
     setError(null)
 
-    try {
-      const response = await fetch("/api/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          post_id: postId,
-          author_name: formData.author_name,
-          password: formData.password,
-          content: formData.content,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to post comment")
-      }
-
-      const newComment = await response.json()
-      setComments(prev => [...prev, newComment])
-      setFormData({ author_name: "", password: "", content: "" })
-    } catch (err) {
-      setError("Failed to post comment. Please try again.")
-      console.error(err)
-    } finally {
-      setIsSubmitting(false)
+    if (!formData.author_name.trim() || !formData.password.trim() || !formData.content.trim()) {
+      setError("Please fill out all fields.")
+      return
     }
+
+    const newComment: Comment = {
+      id: `${postId}-${Date.now()}`,
+      author_name: formData.author_name.trim(),
+      content: formData.content.trim(),
+      created_at: new Date().toISOString(),
+      deleteKey: formData.password.trim(),
+    }
+
+    setComments((prev) => [...prev, newComment])
+    setFormData({ author_name: "", password: "", content: "" })
   }
 
   const handleDelete = async (commentId: string) => {
@@ -71,28 +53,21 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
       return
     }
 
-    try {
-      const response = await fetch("/api/comments", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          comment_id: commentId,
-          password: deletePassword,
-        }),
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.error || "Failed to delete")
-      }
-
-      setComments(prev => prev.filter(c => c.id !== commentId))
-      setDeletingId(null)
-      setDeletePassword("")
-      setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete comment")
+    const target = comments.find((comment) => comment.id === commentId)
+    if (!target) {
+      setError("Comment not found")
+      return
     }
+
+    if (target.deleteKey !== deletePassword) {
+      setError("Invalid password")
+      return
+    }
+
+    setComments((prev) => prev.filter((comment) => comment.id !== commentId))
+    setDeletingId(null)
+    setDeletePassword("")
+    setError(null)
   }
 
   return (
@@ -149,10 +124,9 @@ export function CommentSection({ postId, initialComments }: CommentSectionProps)
         {error && <p className="text-sm text-destructive">{error}</p>}
         <Button 
           type="submit" 
-          disabled={isSubmitting}
           className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
-          {isSubmitting ? "Posting..." : "Post Comment"}
+          Post Comment
         </Button>
       </form>
 

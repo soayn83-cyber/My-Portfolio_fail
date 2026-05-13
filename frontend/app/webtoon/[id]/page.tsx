@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server"
 import { PostDetail } from "@/components/post-detail"
 import { notFound } from "next/navigation"
+import { getCommentsForPost, getPostById } from "@/lib/site-data"
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -12,14 +12,7 @@ export default async function WebtoonDetailPage({ params, searchParams }: PagePr
   const resolvedSearchParams = await searchParams;
   const episodeIndex = resolvedSearchParams.episode ? parseInt(resolvedSearchParams.episode, 10) : undefined;
 
-  const supabase = await createClient();
-  
-  const { data: post } = await supabase
-    .from("posts")
-    .select("*")
-    .eq("id", id)
-    .eq("is_published", true)
-    .single();
+  const post = getPostById(id);
 
   if (!post) {
     notFound();
@@ -36,16 +29,12 @@ export default async function WebtoonDetailPage({ params, searchParams }: PagePr
     }
   }
 
-  const { data: comments } = await supabase
-    .from("comments")
-    .select("id, author_name, content, created_at")
-    .eq("post_id", id)
-    .order("created_at", { ascending: true });
+  const comments = getCommentsForPost(id);
 
   return (
     <PostDetail
       post={post}
-      comments={comments || []}
+      comments={comments}
       backHref="/webtoon"
       backLabel="Back to Webtoon"
     />

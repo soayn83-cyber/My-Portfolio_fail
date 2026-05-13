@@ -7,50 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { PostsManager } from "./posts-manager"
 import { SiteSettingsManager } from "./site-settings-manager"
 import { ProfileManager } from "./profile-manager"
-import { LogOut, Settings, Image, FileText, User } from "lucide-react"
-import type { User as SupabaseUser } from "@supabase/supabase-js"
+import { LogOut, Settings } from "lucide-react"
 import { logoutAdmin } from "@/app/admin/login/actions"
-
-interface Post {
-  id: string
-  category: string
-  title: string
-  description: string | null
-  thumbnail_url: string | null
-  images: string[]
-  is_published: boolean
-  created_at: string
-}
-
-interface SiteSettings {
-  id: string
-  site_name?: string | null
-  site_logo_url?: string | null
-  hero_image_url: string | null
-  hero_text?: string | null
-}
-
-interface ProfileItem {
-  date: string
-  content: string
-}
-
-interface Profile {
-  id: string
-  name: string | null
-  bio: string | null
-  profile_image_url: string | null
-  contact_email: string | null
-  social_links: Record<string, string> | null
-  experience: ProfileItem[] | null
-  certifications: ProfileItem[] | null
-  education: ProfileItem[] | null
-}
+import type { Post, Profile, SiteConfig } from "@/lib/site-data"
 
 interface AdminDashboardProps {
-  user: SupabaseUser
+  user: { email?: string | null }
   posts: Post[]
-  settings: SiteSettings | null
+  settings: SiteConfig | null
   profile: Profile | null
 }
 
