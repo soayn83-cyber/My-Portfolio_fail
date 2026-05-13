@@ -1,28 +1,28 @@
 {
   "node": {
-    "6085195b9f5943bb0141f5cd166c190138c5b25c20": {
+    "60cb95c6951851505047eb56810a99c5faa4ffe4fe": {
       "workers": {
         "app/admin/page": {
-          "moduleId": 98814,
+          "moduleId": 82937,
           "async": false,
           "exportedName": "revalidateSite",
-          "filename": "app/actions.ts"
+          "filename": "frontend/app/actions.ts"
         }
       },
       "exportedName": "revalidateSite",
-      "filename": "app/actions.ts"
+      "filename": "frontend/app/actions.ts"
     },
-    "00b0c9417eb14aa0c684d9dd9b23e30b3f7fae05b5": {
+    "0042fdef312d007ff216ae4381a28d4a5f8363c590": {
       "workers": {
         "app/admin/page": {
-          "moduleId": 98814,
+          "moduleId": 82937,
           "async": false,
           "exportedName": "logoutAdmin",
-          "filename": "app/admin/login/actions.ts"
+          "filename": "frontend/app/admin/login/actions.ts"
         }
       },
       "exportedName": "logoutAdmin",
-      "filename": "app/admin/login/actions.ts"
+      "filename": "frontend/app/admin/login/actions.ts"
     }
   },
   "edge": {}

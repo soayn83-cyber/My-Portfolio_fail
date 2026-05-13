@@ -1,0 +1,3 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["chunks/0r9g_0tjaz0p._.js",28477,e=>{"use strict";var t="u">typeof self?self:e.g;let s=t.fetch,r=t.fetch.bind(t),n=t.Headers,o=t.Request,h=t.Response;e.s(["Headers",0,n,"Request",0,o,"Response",0,h,"default",0,r,"fetch",0,s])},50300,(e,t,s)=>{"use strict";t.exports=function(){throw Error("ws does not work in the browser. Browser clients must use the native WebSocket object")}},5595,(e,t,s)=>{self._ENTRIES||={};let r=Promise.resolve().then(()=>e.i(97914));r.catch(()=>{}),self._ENTRIES.middleware_middleware=new Proxy(r,{get(e,t){if("then"===t)return(t,s)=>e.then(t,s);let s=(...s)=>e.then(e=>(0,e[t])(...s));return s.then=(s,r)=>e.then(e=>e[t]).then(s,r),s}})}]);
+
+//# sourceMappingURL=0r9g_0tjaz0p._.js.map

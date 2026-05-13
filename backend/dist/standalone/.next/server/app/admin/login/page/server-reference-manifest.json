@@ -1,16 +1,16 @@
 {
   "node": {
-    "40a27828cd14da43d361a72c7e934907b5e0467ee2": {
+    "409ac57ec8300d44eba62ab0b02abb90e6669cde0c": {
       "workers": {
         "app/admin/login/page": {
-          "moduleId": 97857,
+          "moduleId": 66600,
           "async": false,
           "exportedName": "loginWithPassword",
-          "filename": "app/admin/login/actions.ts"
+          "filename": "frontend/app/admin/login/actions.ts"
         }
       },
       "exportedName": "loginWithPassword",
-      "filename": "app/admin/login/actions.ts"
+      "filename": "frontend/app/admin/login/actions.ts"
     }
   },
   "edge": {}

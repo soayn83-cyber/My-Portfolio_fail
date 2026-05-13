@@ -7,11 +7,11 @@ const __dirname = path.dirname(__filename);
 const frontendRoot = path.resolve(__dirname, '..');
 const repoRoot = path.resolve(frontendRoot, '..');
 const sourceNextDir = path.join(frontendRoot, '.next');
+const sourceStandaloneDir = path.join(sourceNextDir, 'standalone');
 const sourcePublicDir = path.join(frontendRoot, 'public');
+const sourceStaticDir = path.join(sourceNextDir, 'static');
 const frontendDistDir = path.join(frontendRoot, 'dist');
 const backendDistDir = path.join(repoRoot, 'backend', 'dist');
-const sourceStandaloneDir = path.join(sourceNextDir, 'standalone');
-const sourceStaticDir = path.join(sourceNextDir, 'static');
 
 function removeDir(targetPath) {
   fs.rmSync(targetPath, { recursive: true, force: true });
@@ -50,7 +50,7 @@ if (!fs.existsSync(sourceStandaloneDir)) {
   throw new Error('Cannot find frontend/.next/standalone. Run next build before syncing the output.');
 }
 
-copyDir(sourceStandaloneDir, path.join(frontendDistDir, 'standalone'));
+copyDir(path.join(sourceStandaloneDir, 'frontend'), path.join(frontendDistDir, 'standalone'));
 ensureRuntimeAssets(path.join(frontendDistDir, 'standalone'));
 copyDir(frontendDistDir, backendDistDir);
 

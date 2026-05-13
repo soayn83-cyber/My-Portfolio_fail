@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Quicksand, Cormorant_Garamond } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 import { Header } from '@/components/header'
@@ -8,17 +7,6 @@ import { HeartCursor } from '@/components/heart-cursor'
 import { createClient } from '@/lib/supabase/server'
 
 const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000').replace(/\/$/, '')
-
-const quicksand = Quicksand({ 
-  subsets: ['latin'],
-  variable: '--font-quicksand'
-})
-
-const cormorant = Cormorant_Garamond({ 
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-cormorant'
-})
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -72,7 +60,7 @@ export default async function RootLayout({
 
   return (
     <html lang="ko">
-      <body className={`${quicksand.variable} ${cormorant.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <HeartCursor />
         <Header siteName={siteName} logoUrl={siteLogoUrl} />
         <main>
