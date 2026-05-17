@@ -19,4 +19,21 @@ ALTER TABLE posts ADD COLUMN IF NOT EXISTS production_date TEXT;
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS sub_category TEXT;
 ALTER TABLE posts ADD COLUMN IF NOT EXISTS work_steps JSONB DEFAULT '[]'::jsonb;
 
-ALTER TABLE comments ADD COLUMN IF NOT EXISTS delete_key_hash TEXT;
+CREATE TABLE IF NOT EXISTS comments (
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+	author_name TEXT NOT NULL,
+	content TEXT NOT NULL,
+	delete_key_hash TEXT,
+	created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read comments" ON comments;
+DROP POLICY IF EXISTS "Allow public insert comments" ON comments;
+
+CREATE POLICY "Allow public read comments" ON comments FOR SELECT USING (true);
+CREATE POLICY "Allow public insert comments" ON comments FOR INSERT WITH CHECK (true);
+
+NOTIFY pgrst, 'reload schema';

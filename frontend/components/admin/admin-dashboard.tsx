@@ -16,9 +16,10 @@ interface AdminDashboardProps {
   posts: Post[]
   settings: SiteConfig | null
   profile: Profile | null
+  hasAdminWriteAccess: boolean
 }
 
-export function AdminDashboard({ user, posts, settings, profile }: AdminDashboardProps) {
+export function AdminDashboard({ user, posts, settings, profile, hasAdminWriteAccess }: AdminDashboardProps) {
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
 
@@ -56,6 +57,11 @@ export function AdminDashboard({ user, posts, settings, profile }: AdminDashboar
 
       {/* Main Content */}
       <main className="mx-auto max-w-6xl px-4 py-8">
+        {!hasAdminWriteAccess && (
+          <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Supabase 읽기 연결은 활성화됐지만, 관리자 저장용 `SUPABASE_SERVICE_ROLE_KEY`가 없어 아직 쓰기는 비활성화되어 있습니다.
+          </div>
+        )}
         <Tabs defaultValue="main" className="w-full">
           <TabsList className="mb-8 grid w-full grid-cols-5 bg-primary/10">
             <TabsTrigger value="main" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">

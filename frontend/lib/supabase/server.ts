@@ -27,3 +27,19 @@ export function createSupabaseServerClient(): SupabaseClient | null {
     },
   })
 }
+
+export function createSupabaseReadClient(): SupabaseClient | null {
+  const url = resolveSupabaseUrl()
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
+
+  if (!url || !anonKey) {
+    return null
+  }
+
+  return createClient(url, anonKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}

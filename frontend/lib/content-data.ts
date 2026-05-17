@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { createSupabaseReadClient } from "@/lib/supabase/server"
 import {
   getAllPosts as getFallbackAllPosts,
   getCommentsForPost as getFallbackCommentsForPost,
@@ -38,8 +38,8 @@ function toJsonArray<T>(value: unknown, fallback: T[] = []): T[] {
   return Array.isArray(value) ? (value as T[]) : fallback
 }
 
-function withFallback<T>(fallback: T, loader: (client: NonNullable<ReturnType<typeof createSupabaseServerClient>>) => Promise<T>) {
-  const client = createSupabaseServerClient()
+function withFallback<T>(fallback: T, loader: (client: NonNullable<ReturnType<typeof createSupabaseReadClient>>) => Promise<T>) {
+  const client = createSupabaseReadClient()
 
   if (!client) {
     return Promise.resolve(clone(fallback))

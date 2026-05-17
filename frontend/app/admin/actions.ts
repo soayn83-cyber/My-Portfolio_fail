@@ -48,20 +48,37 @@ export async function saveSiteSettings(settings: SiteConfig): Promise<ActionResu
     updated_at: new Date().toISOString(),
   }
 
-  const { data: existingRow, error: readError } = await client.from("site_settings").select("id").order("updated_at", { ascending: false }).limit(1).maybeSingle()
-
-  if (readError) {
-    return { success: false, error: readError.message }
+  const legacyPayload = {
+    site_name: normalizeText(settings.siteName) ?? "Portfolio",
+    site_logo_url: buildNullishString(settings.logoUrl),
+    hero_image_url: buildNullishString(settings.heroImageUrl),
+    hero_text: normalizeText(settings.mainText) ?? normalizeText(settings.subText),
+    updated_at: payload.updated_at,
   }
 
-  const mutation = existingRow?.id
-    ? client.from("site_settings").upsert({ id: existingRow.id, ...payload }, { onConflict: "id" })
-    : client.from("site_settings").insert(payload)
+  async function upsertSiteSettings(row: Record<string, unknown>) {
+    const { data: existingRow, error: readError } = await client.from("site_settings").select("id").order("updated_at", { ascending: false }).limit(1).maybeSingle()
 
-  const { error } = await mutation
+    if (readError) {
+      return { error: readError }
+    }
 
-  if (error) {
-    return { success: false, error: error.message }
+    const mutation = existingRow?.id
+      ? client.from("site_settings").upsert({ id: existingRow.id, ...row }, { onConflict: "id" })
+      : client.from("site_settings").insert(row)
+
+    const { error } = await mutation
+    return { error }
+  }
+
+  let result = await upsertSiteSettings(payload)
+
+  if (result.error && /main_text|sub_text|profile_image_url|schema cache/i.test(result.error.message)) {
+    result = await upsertSiteSettings(legacyPayload)
+  }
+
+  if (result.error) {
+    return { success: false, error: result.error.message }
   }
 
   refreshContent()
