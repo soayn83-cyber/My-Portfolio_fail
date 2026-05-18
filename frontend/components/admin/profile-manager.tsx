@@ -27,6 +27,15 @@ type DraftProfile = {
   work_links: string
 }
 
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "")
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
 function safeJson<T>(value: string, fallback: T): T {
   if (!value.trim()) {
     return fallback
@@ -58,13 +67,13 @@ export function ProfileManager({ profile }: ProfileManagerProps) {
     work_links: formatJson(profile?.work_links || []),
   })
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) {
       return
     }
 
-    const previewUrl = URL.createObjectURL(file)
+    const previewUrl = await readFileAsDataUrl(file)
     setFormData((previous) => ({ ...previous, profile_image_url: previewUrl }))
   }
 

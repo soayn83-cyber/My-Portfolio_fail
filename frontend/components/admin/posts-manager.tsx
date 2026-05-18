@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, X } from "lucide-react"
+import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, Upload, X } from "lucide-react"
 import type { EpisodeLink, Post, WorkStep } from "@/lib/site-data"
 import { deletePost, savePost, swapPostOrder } from "@/app/admin/actions"
 
@@ -57,6 +57,15 @@ function emptyDraft(category: string): DraftPost {
 
 function serializeLines(values: string[]) {
   return values.join("\n")
+}
+
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "")
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
 }
 
 function parseLines(value: string) {
@@ -157,6 +166,45 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
     setNotice(saveResult.success ? (editingId ? "Post saved to Supabase." : "Post created in Supabase.") : `${saveResult.error || "Supabase save failed."} Local state was updated.`)
     cancelEdit()
     setIsSaving(false)
+  }
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    const dataUrl = await readFileAsDataUrl(file)
+    setDraft((previous) => ({ ...previous, thumbnail_url: dataUrl }))
+    e.target.value = ""
+  }
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) {
+      return
+    }
+
+    const dataUrl = await readFileAsDataUrl(file)
+    setDraft((previous) => ({ ...previous, pdf_url: dataUrl }))
+    e.target.value = ""
+  }
+
+  const handleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) {
+      return
+    }
+
+    const dataUrls = await Promise.all(files.map((file) => readFileAsDataUrl(file)))
+    setDraft((previous) => {
+      const existingImages = parseLines(previous.imagesText)
+      return {
+        ...previous,
+        imagesText: serializeLines([...existingImages, ...dataUrls]),
+      }
+    })
+    e.target.value = ""
   }
 
   const handleDelete = async (id: string) => {
@@ -269,32 +317,54 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-2">
                 <Label>Thumbnail URL</Label>
-                <Input
-                  value={draft.thumbnail_url}
-                  onChange={(event) => setDraft((previous) => ({ ...previous, thumbnail_url: event.target.value }))}
-                  className="border-primary/20"
-                  placeholder="/placeholder.jpg"
-                />
+                <div className="space-y-2">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-primary/30 px-4 py-2 transition-colors hover:bg-primary/5">
+                    <Upload className="h-4 w-4 text-primary" />
+                    <span className="text-sm">썸네일 파일 선택</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleThumbnailUpload} />
+                  </label>
+                  <Input
+                    value={draft.thumbnail_url}
+                    onChange={(event) => setDraft((previous) => ({ ...previous, thumbnail_url: event.target.value }))}
+                    className="border-primary/20"
+                    placeholder="/placeholder.jpg 또는 data URL"
+                  />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>PDF URL</Label>
-                <Input
-                  value={draft.pdf_url}
-                  onChange={(event) => setDraft((previous) => ({ ...previous, pdf_url: event.target.value }))}
-                  className="border-primary/20"
-                  placeholder="/placeholder.svg"
-                />
+                <div className="space-y-2">
+                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-primary/30 px-4 py-2 transition-colors hover:bg-primary/5">
+                    <Upload className="h-4 w-4 text-primary" />
+                    <span className="text-sm">PDF 파일 선택</span>
+                    <input type="file" accept="application/pdf" className="hidden" onChange={handlePdfUpload} />
+                  </label>
+                  <Input
+                    value={draft.pdf_url}
+                    onChange={(event) => setDraft((previous) => ({ ...previous, pdf_url: event.target.value }))}
+                    className="border-primary/20"
+                    placeholder="/placeholder.svg 또는 data URL"
+                  />
+                </div>
               </div>
             </div>
 
             <div className="space-y-2">
               <Label>Images (one per line)</Label>
-              <Textarea
-                value={draft.imagesText}
-                onChange={(event) => setDraft((previous) => ({ ...previous, imagesText: event.target.value }))}
-                rows={4}
-                className="border-primary/20 font-mono text-sm"
-              />
+              <div className="space-y-2">
+                <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-primary/30 px-4 py-2 transition-colors hover:bg-primary/5">
+                  <Plus className="h-4 w-4 text-primary" />
+                  <span className="text-sm">이미지 파일 여러 개 선택</span>
+                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleImagesUpload} />
+                </label>
+                <Textarea
+                  value={draft.imagesText}
+                  onChange={(event) => setDraft((previous) => ({ ...previous, imagesText: event.target.value }))}
+                  rows={4}
+                  className="border-primary/20 font-mono text-sm"
+                  placeholder="URL 또는 data URL을 한 줄에 하나씩 입력하세요"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

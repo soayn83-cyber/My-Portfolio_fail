@@ -24,6 +24,15 @@ type DraftSettings = {
   profileImageUrl: string
 }
 
+function readFileAsDataUrl(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "")
+    reader.onerror = () => reject(reader.error)
+    reader.readAsDataURL(file)
+  })
+}
+
 export function SiteSettingsManager({ settings }: SiteSettingsManagerProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -36,15 +45,17 @@ export function SiteSettingsManager({ settings }: SiteSettingsManagerProps) {
     profileImageUrl: settings?.profileImageUrl || "",
   })
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: keyof Pick<DraftSettings, "siteLogoUrl" | "heroImageUrl" | "profileImageUrl">) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: keyof Pick<DraftSettings, "siteLogoUrl" | "heroImageUrl" | "profileImageUrl">) => {
     const file = e.target.files?.[0]
     if (!file) {
       return
     }
 
+    const dataUrl = await readFileAsDataUrl(file)
+
     setFormData((previous) => ({
       ...previous,
-      [field]: URL.createObjectURL(file),
+      [field]: dataUrl,
     }))
   }
 
