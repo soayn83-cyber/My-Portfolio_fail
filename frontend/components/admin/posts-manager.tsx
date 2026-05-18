@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
 import { ArrowDown, ArrowUp, Pencil, Plus, Trash2, Upload, X } from "lucide-react"
 import type { EpisodeLink, Post, WorkStep } from "@/lib/site-data"
+import { readFileAsDataUrl } from "@/lib/upload-utils"
 import { deletePost, savePost, swapPostOrder } from "@/app/admin/actions"
 
 const categories = [
@@ -57,15 +58,6 @@ function emptyDraft(category: string): DraftPost {
 
 function serializeLines(values: string[]) {
   return values.join("\n")
-}
-
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "")
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
 }
 
 function parseLines(value: string) {
@@ -174,9 +166,14 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
       return
     }
 
-    const dataUrl = await readFileAsDataUrl(file)
-    setDraft((previous) => ({ ...previous, thumbnail_url: dataUrl }))
-    e.target.value = ""
+    try {
+      const dataUrl = await readFileAsDataUrl(file)
+      setDraft((previous) => ({ ...previous, thumbnail_url: dataUrl }))
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "썸네일 업로드에 실패했습니다.")
+    } finally {
+      e.target.value = ""
+    }
   }
 
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,9 +182,14 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
       return
     }
 
-    const dataUrl = await readFileAsDataUrl(file)
-    setDraft((previous) => ({ ...previous, pdf_url: dataUrl }))
-    e.target.value = ""
+    try {
+      const dataUrl = await readFileAsDataUrl(file)
+      setDraft((previous) => ({ ...previous, pdf_url: dataUrl }))
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "PDF 업로드에 실패했습니다.")
+    } finally {
+      e.target.value = ""
+    }
   }
 
   const handleImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,15 +198,20 @@ export function PostsManager({ posts: initialPosts, defaultCategory = "webtoon" 
       return
     }
 
-    const dataUrls = await Promise.all(files.map((file) => readFileAsDataUrl(file)))
-    setDraft((previous) => {
-      const existingImages = parseLines(previous.imagesText)
-      return {
-        ...previous,
-        imagesText: serializeLines([...existingImages, ...dataUrls]),
-      }
-    })
-    e.target.value = ""
+    try {
+      const dataUrls = await Promise.all(files.map((file) => readFileAsDataUrl(file)))
+      setDraft((previous) => {
+        const existingImages = parseLines(previous.imagesText)
+        return {
+          ...previous,
+          imagesText: serializeLines([...existingImages, ...dataUrls]),
+        }
+      })
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.")
+    } finally {
+      e.target.value = ""
+    }
   }
 
   const handleDelete = async (id: string) => {

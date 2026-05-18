@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Upload, X } from "lucide-react"
 import type { SiteConfig } from "@/lib/site-data"
+import { readFileAsDataUrl } from "@/lib/upload-utils"
 import { saveSiteSettings } from "@/app/admin/actions"
 
 interface SiteSettingsManagerProps {
@@ -22,15 +23,6 @@ type DraftSettings = {
   siteLogoUrl: string
   heroImageUrl: string
   profileImageUrl: string
-}
-
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "")
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
 }
 
 export function SiteSettingsManager({ settings }: SiteSettingsManagerProps) {
@@ -51,12 +43,18 @@ export function SiteSettingsManager({ settings }: SiteSettingsManagerProps) {
       return
     }
 
-    const dataUrl = await readFileAsDataUrl(file)
+    try {
+      const dataUrl = await readFileAsDataUrl(file)
 
-    setFormData((previous) => ({
-      ...previous,
-      [field]: dataUrl,
-    }))
+      setFormData((previous) => ({
+        ...previous,
+        [field]: dataUrl,
+      }))
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.")
+    } finally {
+      e.target.value = ""
+    }
   }
 
   const clearField = (field: keyof Pick<DraftSettings, "siteLogoUrl" | "heroImageUrl" | "profileImageUrl">) => {

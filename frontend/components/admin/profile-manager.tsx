@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Upload, X } from "lucide-react"
 import type { Profile, ProfileItem, WorkLink } from "@/lib/site-data"
+import { readFileAsDataUrl } from "@/lib/upload-utils"
 import { saveProfile } from "@/app/admin/actions"
 
 interface ProfileManagerProps {
@@ -25,15 +26,6 @@ type DraftProfile = {
   certifications: string
   education: string
   work_links: string
-}
-
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : "")
-    reader.onerror = () => reject(reader.error)
-    reader.readAsDataURL(file)
-  })
 }
 
 function safeJson<T>(value: string, fallback: T): T {
@@ -73,8 +65,14 @@ export function ProfileManager({ profile }: ProfileManagerProps) {
       return
     }
 
-    const previewUrl = await readFileAsDataUrl(file)
-    setFormData((previous) => ({ ...previous, profile_image_url: previewUrl }))
+    try {
+      const previewUrl = await readFileAsDataUrl(file)
+      setFormData((previous) => ({ ...previous, profile_image_url: previewUrl }))
+    } catch (error) {
+      setSavedMessage(error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.")
+    } finally {
+      e.target.value = ""
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
