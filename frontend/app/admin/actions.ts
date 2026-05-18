@@ -198,7 +198,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
     keywords: buildNullishString(post.keywords),
     production_date: buildNullishString(post.production_date),
     sub_category: buildNullishString(post.sub_category),
-    work_steps,
+    work_steps: workSteps,
   }
 
   const legacyPayload = {
@@ -215,7 +215,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
     keywords: buildNullishString(post.keywords),
     production_date: buildNullishString(post.production_date),
     sub_category: buildNullishString(post.sub_category),
-    work_steps,
+    work_steps: workSteps,
   }
 
   const { error } = await client.from("posts").upsert(payload, { onConflict: "id" })
@@ -225,7 +225,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
 
     if (!legacyError) {
       refreshContent()
-      return { success: true, data: { ...post, thumbnail_url: thumbnailUrl, images, pdf_url: pdfUrl, work_steps } }
+      return { success: true, data: { ...post, thumbnail_url: thumbnailUrl, images, pdf_url: pdfUrl, work_steps: workSteps } }
     }
 
     return { success: false, error: legacyError.message }
@@ -243,7 +243,7 @@ export async function savePost(post: Post): Promise<ActionResult<Post>> {
       thumbnail_url: thumbnailUrl,
       images,
       pdf_url: pdfUrl,
-      work_steps,
+      work_steps: workSteps,
     },
   }
 }
